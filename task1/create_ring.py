@@ -1,19 +1,15 @@
 """
 作者 ljx
-使用PyOpenGL 创建一个管道的3D mesh模型文件 ring.obj
+创建一个管道的3D mesh模型文件 ring.obj
 2024/4/7
 
 mayble: 
 pip install scipy
-pip install PyOpenGL
 """
 
 
 
 import math
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 import open3d as o3d
@@ -32,7 +28,6 @@ def rotate_model(vertices, normal1, normal2):
     # Apply the rotation to each vertex
     rotated_vertices = [rotation.apply(vertex) for vertex in vertices]
     return rotated_vertices
-
 
 def create_ring_obj(r1, r2, theta, phi, center = [0,0,0], normal = [0, 0, 1], alphaStep = 100, betaStep = 50):
     """
@@ -72,26 +67,11 @@ def create_ring_obj(r1, r2, theta, phi, center = [0,0,0], normal = [0, 0, 1], al
             v4 = ((i+1) % alphaStep) * betaStep + j
             faces.append([v1, v2, v3, v4])
     
-
-
     # rotate the model
     vertice2 = rotate_model(vertices, [0, 0, 1], normal)
     vertices = [[v[0] + center[0], v[1] + center[1], v[2] + center[2]] for v in vertice2]
 
-    # export obj file
-    # write to file
-    # with open('ring.obj', 'w') as f:
-    #     for v in vertices:
-    #         f.write(f'v {v[0]} {v[1]} {v[2]}\n')
-
-    #     for face in faces:
-    #         f.write('f')
-    #         for vertex in face:
-    #             f.write(f' {vertex+1}')
-    #         f.write('\n')
-    #     # close file
-    #     f.close()
-
+    #for open3d interface
     triangles = []
     for face in faces:
         triangles.append([face[0],face[1],face[2]])
@@ -99,16 +79,13 @@ def create_ring_obj(r1, r2, theta, phi, center = [0,0,0], normal = [0, 0, 1], al
     mesh = o3d.geometry.TriangleMesh()
     mesh.vertices = o3d.utility.Vector3dVector(vertices)
     mesh.triangles = o3d.utility.Vector3iVector(triangles)
-    
-    #mesh.compute_vertex_normals()
-    #o3d.visualization.draw([mesh])
+    #visualize
+    o3d.visualization.draw([mesh])
+    #export obj
+    o3d.io.write_triangle_mesh("ring.obj", mesh)
     return mesh
 
 
 
 if __name__ == '__main__':
     mesh = create_ring_obj(100, 10, np.pi/4, 2*np.pi/3, [0.7, 0.3, 0.5], [5, 5, 6])
-
-    radius = 0.05  
-    point_cloud = mesh.sample_points_poisson_disk(2000)
-    o3d.visualization.draw([point_cloud])
