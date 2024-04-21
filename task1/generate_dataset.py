@@ -26,6 +26,7 @@ if __name__ == '__main__':
         pcd = sample_mesh_nearly(mesh,num_points)
         X[i] = np.asarray(pcd.points)
 
+
     with h5py.File('data.h5','w') as hf:
         hf.create_dataset("X",data=X)
         hf.create_dataset("y",data=y)

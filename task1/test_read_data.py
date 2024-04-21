@@ -1,10 +1,15 @@
 import h5py
 import numpy as np
 import open3d as o3d
+import argparse
 from create_ring import create_ring_obj
-with h5py.File("data.h5","r") as hf:
-    X = hf["X"][8]
-    y = hf["y"][8]
+parser = argparse.ArgumentParser()
+parser.add_argument("data_path",type=str,help="dataset path")
+args = parser.parse_args()
+
+with h5py.File(args.data_path,"r") as hf:
+    X = hf["X"][20]
+    y = hf["y"][20]
     r1 = y[0]
     r2 = y[1]
     theta = y[2]
@@ -18,6 +23,6 @@ with h5py.File("data.h5","r") as hf:
 
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(np.asarray(X))
-    o3d.visualization.draw([pcd])
+    o3d.visualization.draw([pcd,mesh])
 
 
